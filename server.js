@@ -1,5 +1,8 @@
  var express=require('express');
 const mustacheExpress=require('mustache-express');
+
+require('dotenv').config();//to load all the configuration
+//console.log(process.env);
  const app=express();
 
  const mustache=mustacheExpress();
@@ -16,4 +19,6 @@ res.send("test");
 app.get('/student',(req,res)=>{
 res.render('student');
 });
- app.listen(8002,()=>{console.log("server is running at port 8002..")});
+ app.listen(process.env.PORT,()=>{
+   console.log(`server is running at port ${process.env.PORT}..`);
+ });
