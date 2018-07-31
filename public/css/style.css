@@ -16,11 +16,21 @@ button {
     width: 100%;
     opacity: 0.9;
 }
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 10px;
+    text-align: left;
+}
 
 button:hover {
     opacity:1;
 }
-
+th {
+    background-color: black;
+    color: white;}
 /* Extra styles for the cancel button */
 .cancelbtn {
     padding: 14px 20px;
