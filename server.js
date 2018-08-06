@@ -20,17 +20,36 @@ app.use(bodyParser.urlencoded({extended:false}));
 
 
 app.get('/',(req,res)=>{
-  res.send("test");
+
 });
 
-app.get('/student',(req,res)=>{
-  res.render('student');
+app.get('/StudentSignUp',(req,res)=>{
+  res.render('StudentSignUp');
 });
+
+
+app.post('/StudentSignUpConfirmationPage',(req,res)=>{
+  var client = new pg.Client(conString);
+client.connect().then(()=>{
+console.log('conection is successful');
+    const sql=`insert into "Student"(s_name,s_username,s_password,s_email) VALUES ($1,$2,$3,$4)`;
+  const params=[req.body.name,req.body.username,req.body.password,req.body.email];
+  return client.query(sql,params);
+}).then((result)=>{
+console.log('result?',result);
+res.render('StudentSignUpConfirmationPage');
+}).catch((err)=>{
+  console.log(err);
+  res.send(err);
+});
+});
+
+
 app.get('/AllStudent',(req,res)=>{
   var client = new pg.Client(conString);
   console.log("display the record for all students");
   client.connect().then(()=>{
-    return client.query(`select * from "Student"`);
+    return client.query(`select * from "Student" order by s_id desc`);
     }).then((result)=>{
       console.log(result);
         console.log('-------------------------------------------------------');
@@ -40,24 +59,6 @@ app.get('/AllStudent',(req,res)=>{
           });
 
 });
-
-app.post('/AllStudent',(req,res)=>{
-  var client = new pg.Client(conString);
-client.connect().then(()=>{
-console.log('conection is successful');
-    const sql=`insert into "Student"(s_name,s_username,s_password,s_email) VALUES ($1,$2,$3,$4)`;
-  const params=[req.body.name,req.body.username,req.body.password,req.body.email];
-  return client.query(sql,params);
-}).then((result)=>{
-console.log('result?',result);
-res.redirect('AllStudent');
-}).catch((err)=>{
-  console.log(err);
-  res.send(err);
-});
-});
-
-
 
  app.post('/student/delete/:id',(req,res)=>{
 const client=new pg.Client(conString);
@@ -71,6 +72,37 @@ res.send('record deleted');
 .catch((err)=>{console.log(err);})
  });
 
+app.get('/student/edit/:id',(req,res)=>{
+  const client =new pg.Client(conString);
+  client.connect().then(()=>{
+  const sql=`select * from "Student" where s_id=$1`;
+  const params=[req.params.id];
+  return client.query(sql,params);
+}).then((result)=>{
+  console.log(result);
+  res.render('StudentEdit',result.rows[0]);
+}).catch((err)=>{console.log('error',err);
+res.send(err);}
+);
+});
+
+app.post('/student/edit/:id',(req,res)=>{
+  const client=new pg.Client(conString);
+  client.connect().then(()=>{
+    const sql=`update "Student" set s_username=$1, s_email=$2, s_password=$3 where s_id=$4;`;
+    const params=[req.body.username,req.body.email,req.body.password,req.params.id];
+    console.log(sql);
+    console.log(params);
+    return client.query(sql,params);
+  }).then((result)=>{
+    console.log(result);
+    //app.get('/AllStudent');
+res.redirect('/AllStudent');
+  }).catch((error)=>{
+    console.log(error);
+  });
+
+});
 
 
  app.listen(process.env.PORT,()=>{

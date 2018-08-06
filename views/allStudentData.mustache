@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <body>
-  <link href="css/bootstrap.min.css" rel="stylesheet">
- <link href="css/style.css" rel="stylesheet">
+  <link href="css/bootstrap.css" type="text/css" rel="stylesheet">
+ <link href="css/style.css" type="text/css" rel="stylesheet">
 <h2>Basic HTML Table</h2>
 
 <table >
@@ -11,6 +11,7 @@
     <th>Username</th>
     <th>Password</th>
     <th>email</th>
+    <th>Edit</th>
     <th>Delete</th>
   </tr>
   {{#rows}}
@@ -19,6 +20,7 @@
 <td>{{s_username}}</td>
 <td>{{s_password}}</td>
 <td>{{s_email}}</td>
+<td><a href="/student/edit/{{s_id}}">edit</td>
 <td><form method="post" action="/student/delete/{{s_id}}">
 <button type="submit">Delete</button>
 </form>
