@@ -3,7 +3,7 @@ const mustacheExpress=require('mustache-express');
 const bodyParser=require('body-parser');
 var pg = require('pg');
 var conString = "postgres://meenu:Meenu@123@localhost:5432/RestAPI";
-
+var session = require('express-session');
 
 
 require('dotenv').config();//to load all the configuration
@@ -17,10 +17,21 @@ app.set('view engine','mustache');
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended:false}));
+app.use(session({ secret: 'cookie_secret',
+                  resave: true,
+                  saveUninitialized: true}));
 
-
-app.get('/',(req,res)=>{
-
+app.get('/',(req,res,next)=>{
+  if (req.session.views) {
+      req.session.views++;
+      res.setHeader('Content-Type', 'text/html');
+      res.write('<p>views: ' + req.session.views + '</p>');
+      res.write('<p>expires in: ' + (req.session.cookie.maxAge / 1000) + 's</p>');
+      res.end();
+    } else {
+      req.session.views = 1;
+      res.end('welcome to the session demo. refresh!');
+    }
 });
 
 app.get('/StudentSignUp',(req,res)=>{
@@ -32,8 +43,8 @@ app.post('/StudentSignUpConfirmationPage',(req,res)=>{
   var client = new pg.Client(conString);
 client.connect().then(()=>{
 console.log('conection is successful');
-    const sql=`insert into "Student"(s_name,s_username,s_password,s_email) VALUES ($1,$2,$3,$4)`;
-  const params=[req.body.name,req.body.username,req.body.password,req.body.email];
+    const sql=`insert into "Student"(s_fullname,s_username,s_password,s_email,s_address) VALUES ($1,$2,$3,$4,$5)`;
+  const params=[req.body.fullname,req.body.username,req.body.password,req.body.email,req.body.address];
   return client.query(sql,params);
 }).then((result)=>{
 console.log('result?',result);
